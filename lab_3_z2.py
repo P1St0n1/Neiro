@@ -21,14 +21,14 @@ y = np.array([label_map[label] for label in y])
 
 # Преобразование данных в тензоры PyTorch
 X_tensor = torch.tensor(X, dtype=torch.float32)
-y_tensor = torch.tensor(y, dtype=torch.long)
+y_tensor = torch.tensor(y, dtype=torch.float32).view(-1, 1)
 
 # Создание полносвязного слоя (нейронной сети)
 # Входной размер: 4 (количество параметров), выходной размер: 3 (количество классов)
-model = nn.Linear(4, 2)
+model = nn.Linear(4, 1)
 
 # Определение функции потерь и оптимизатора
-loss_fn = nn.CrossEntropyLoss()  # Подходит для задач классификации
+loss_fn = nn.MSELoss()  # Подходит для задач классификации
 optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
 # Цикл обучения
@@ -36,9 +36,9 @@ num_epochs = 100
 for epoch in range(num_epochs):
     # Прямой проход (предсказание)
     outputs = model(X_tensor)
-    
+    # outputs = outputs>0.5
     # Вычисление ошибки
-    loss = loss_fn(outputs, y_tensor)
+    loss = loss_fn(outputs.to(torch.float32), y_tensor)
     
     # Обратный проход и оптимизация
     optimizer.zero_grad()  # Обнуление градиентов
